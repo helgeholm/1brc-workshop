@@ -27,18 +27,17 @@ def generate(count, stations):
     max_record_length = max(len(ws.name) + len("-99.9\n") for ws in stations)
     max_file_size = count * max_record_length
     with open("measurements.txt", "w") as f:
-        f.truncate(max_file_size)
         written = 0
         print("Generating measurements.txt...")
         nerd = ClockNerd(count)
         for i in range(count):
             if i % 1000000 == 0:
                 nerd.update(i)
-            station = random.choice(stations)
-            measurement = station.avg + random.randint(-109, 109)
+            r = random.getrandbits(16)
+            station = stations[r%len(stations)]
+            measurement = station.avg - 109 + (r % 218)
             written += f.write(f"{station.name}{measurement // 10}.{measurement % 10}\n")
         print("\r100.00%")
-        f.truncate(written)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
