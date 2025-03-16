@@ -37,6 +37,7 @@ def generate(count, stations):
             measurement = station.avg - 109 + (r % 218)
             f.write(f"{station.name}{measurement // 10}.{measurement % 10}\n")
         nerd.update(count)
+    print()
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
