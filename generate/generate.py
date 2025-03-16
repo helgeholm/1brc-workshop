@@ -1,10 +1,27 @@
-import sys
 import random
+import sys
+import time
 
 class WeatherStationSource:
     def __init__(self, name, avg):
         self.name = name
         self.avg = avg
+
+class ClockNerd:
+    def __init__(self, work):
+        self.work = work
+        self.start = time.time()
+    def update(self, completed):
+        def fmt(secs):
+            return f"{int(secs)//60:d}m{int(secs)%60:d}s"
+        print(f" {(completed / self.work) * 100:.2f}%", end="")
+        if completed > 0:
+            elapsed = time.time() - self.start
+            unit = elapsed / completed
+            total = self.work * unit
+            remain = total - elapsed
+            print(f" -{fmt(remain)} (of {fmt(total)})        ", end="")
+        print("", end="\r", flush=True)
 
 def generate(count, stations):
     max_record_length = max(len(ws.name) + len("-99.9\n") for ws in stations)
@@ -13,9 +30,10 @@ def generate(count, stations):
         f.truncate(max_file_size)
         written = 0
         print("Generating measurements.txt...")
+        nerd = ClockNerd(count)
         for i in range(count):
             if i % 1000000 == 0:
-                print(f"\r{(i / count) * 100:.2f}%", end="", flush=True)
+                nerd.update(i)
             station = random.choice(stations)
             measurement = station.avg + random.randint(-109, 109)
             written += f.write(f"{station.name}{measurement // 10}.{measurement % 10}\n")
